@@ -96,11 +96,46 @@ public class JpaMain {
              */
 
             // 준영속
-            Member member = em.find(Member.class, 150L); // 조회1
-            member.setName("AAAAA");
+//            Member member = em.find(Member.class, 150L); // 조회1
+//            member.setName("AAAAA");
 //            em.detach(member); // 특정 엔티티(member)만 준영속 상태로 전환
-            em.clear(); // 영속성 컨텍스트 완전히 초기화
-            Member member2= em.find(Member.class, 150L); // 조회2 : clear로 초기화되어 1차 캐시에 없으므로 다시 조회
+//            em.clear(); // 영속성 컨텍스트 완전히 초기화
+//            Member member2= em.find(Member.class, 150L); // 조회2 : clear로 초기화되어 1차 캐시에 없으므로 다시 조회
+//            System.out.println("===========");
+
+
+            /** 기본키 매핑 : IDENTITY **/
+//            Member member = new Member();
+//            member.setUsername("C");
+//            System.out.println("===========");
+//            em.persist(member); // insert 쿼리 실행!
+                    // IDENTITY는 insert 후에 PK 값을 알 수 있기 때문에 예외적.
+//            System.out.println("member.getId() = " + member.getId()); // insert 쿼리와 동시에 바로 PK 확인 가능.
+                    // 따로 select 쿼리를 날리지 않아도 insert 하는 시점에 바로 return 되어 영속성 컨텍스트에 저장됨.
+//            System.out.println("===========");
+
+            /** 기본키 매핑 : SEQUENCE **/
+//            Member member = new Member();
+//            member.setUsername("C");
+            Member member1 = new Member();
+            member1.setUsername("A");
+            Member member2 = new Member();
+            member2.setUsername("B");
+            Member member3 = new Member();
+            member3.setUsername("C");
+            // SequenceGenerator의 allocationsSize 속성 설정 시
+            // ex) create sequence member_seq start with 1 increment by 50 실행
+            System.out.println("===========");
+//            em.persist(member); // call next value for SEQUENCE_NAME 실행!
+                    // DB에서 PK로 사용할 값을 시퀀스에서 가져옴.
+            em.persist(member1); // SEQUENCE 1, 51
+            em.persist(member2); // MEMORY
+            em.persist(member3); // MEMORY
+                    // ... 메모리가 51이 됐을 때 51부터 100까지 또 호출 ...
+//            System.out.println("member.getId() = " + member.getId()); // 가져온 값은 영속성 컨텍스트에 저장됨. 따라서 버퍼링 기능 사용 가능.
+            System.out.println("member1.getId() = " + member1.getId());
+            System.out.println("member2.getId() = " + member2.getId());
+            System.out.println("member3.getId() = " + member3.getId());
             System.out.println("===========");
 
             tx.commit(); // 이 때 DB에 SQL 전달 O
